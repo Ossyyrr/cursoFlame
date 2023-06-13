@@ -1,33 +1,158 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class PlayerSpriteSheetComponent extends SpriteAnimationComponent {
+class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable, KeyboardHandler {
+  // Tappable para los eventos de toque
   // KeyboardHandler necesita el HasKeyboardHandlerComponents en el main
   late double screenWidth, screenHeight, centerX, centerY;
   final double spriteSheetWidth = 680, spriteSheetHeight = 472; // Valores de la imagen de un dino
+
+  int posX = 0, posY = 0;
+  double playerSpeed = 500;
+
+  int animationIndex = 0;
+  bool isRight = true;
 
   late SpriteAnimation dinoDeadAnimation, dinoIdleAnimation, dinoJumpAnimation, dinoRunAnimation, dinoWalkAnimation;
 
   @override
   Future<void> onLoad() async {
+    anchor = const Anchor(0.33, 0.5);
+
     final spriteImage = await Flame.images.load('dino.png');
     final spriteSheet = SpriteSheet(image: spriteImage, srcSize: Vector2(spriteSheetWidth, spriteSheetHeight));
-    // sprite = spriteSheet.getSprite(0, 0);
-    // SpriteAnimation.spriteList(sprites, stepTime: stepTime)
 
-    animation = spriteSheet.createAnimationByLimit(xInit: 0, yInit: 0, step: 8, sizeX: 2, stepTime: 0.1);
+    dinoDeadAnimation = spriteSheet.createAnimationByLimit(xInit: 0, yInit: 0, step: 8, sizeX: 5, stepTime: 0.1);
+    dinoIdleAnimation = spriteSheet.createAnimationByLimit(xInit: 1, yInit: 2, step: 10, sizeX: 5, stepTime: 0.1);
+    dinoJumpAnimation = spriteSheet.createAnimationByLimit(xInit: 3, yInit: 0, step: 12, sizeX: 5, stepTime: 0.1);
+    dinoRunAnimation = spriteSheet.createAnimationByLimit(xInit: 5, yInit: 0, step: 8, sizeX: 5, stepTime: 0.1);
+    dinoWalkAnimation = spriteSheet.createAnimationByLimit(xInit: 6, yInit: 2, step: 10, sizeX: 5, stepTime: 0.1);
+
+    animation = dinoWalkAnimation;
 
     screenWidth = MediaQueryData.fromWindow(window).size.width;
     screenHeight = MediaQueryData.fromWindow(window).size.height;
     centerX = (screenWidth / 2) - (spriteSheetWidth / 2);
     centerY = (screenHeight / 2) - (spriteSheetHeight / 2);
 
-    size = Vector2(spriteSheetWidth, spriteSheetHeight);
+    size = Vector2(spriteSheetWidth / 4, spriteSheetHeight / 4); // Tamaño dino
     position = Vector2(centerX, centerY);
+  }
+
+  @override
+  bool onTapDown(TapDownInfo info) {
+    print(info);
+    // animationIndex++;
+
+    // if (animationIndex > 4) animationIndex = 0;
+
+    // switch (animationIndex) {
+    //   case 0:
+    //     animation = dinoDeadAnimation;
+    //     break;
+    //   case 1:
+    //     animation = dinoIdleAnimation;
+    //     break;
+    //   case 2:
+    //     animation = dinoJumpAnimation;
+    //     break;
+    //   case 3:
+    //     animation = dinoRunAnimation;
+    //     break;
+    //   case 4:
+    //     animation = dinoWalkAnimation;
+    //     break;
+    //   default:
+    //     animation = dinoIdleAnimation;
+    // }
+
+    super.onTapDown(info);
+    return true;
+  }
+
+  // @override
+  // bool onTapUp(TapUpInfo info) {
+  //   print(info);
+  //   super.onTapUp(info);
+  //   return true;
+  // }
+
+  @override
+  bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    if (keysPressed.isEmpty) animation = dinoIdleAnimation;
+
+    // ANDAR
+    if (keysPressed.contains(LogicalKeyboardKey.arrowRight) || keysPressed.contains(LogicalKeyboardKey.keyD)) {
+      if (!isRight) {
+        isRight = true;
+        flipHorizontally();
+      }
+      playerSpeed = 500;
+      animation = dinoWalkAnimation;
+      posX++;
+    }
+    if (keysPressed.contains(LogicalKeyboardKey.arrowLeft) || keysPressed.contains(LogicalKeyboardKey.keyA)) {
+      if (isRight) {
+        isRight = false;
+        flipHorizontally();
+      }
+      playerSpeed = 500;
+      animation = dinoWalkAnimation;
+      posX--;
+    }
+
+    if (keysPressed.contains(LogicalKeyboardKey.arrowUp) || keysPressed.contains(LogicalKeyboardKey.keyW)) {
+      animation = dinoWalkAnimation;
+      playerSpeed = 500;
+      posY--;
+    }
+    if (keysPressed.contains(LogicalKeyboardKey.arrowDown) || keysPressed.contains(LogicalKeyboardKey.keyS)) {
+      animation = dinoWalkAnimation;
+      playerSpeed = 500;
+      posY++;
+    }
+
+    // CORRER
+    if ((keysPressed.contains(LogicalKeyboardKey.arrowRight) || keysPressed.contains(LogicalKeyboardKey.keyD)) &&
+        (keysPressed.contains(LogicalKeyboardKey.shiftLeft) || keysPressed.contains(LogicalKeyboardKey.shiftRight))) {
+      if (!isRight) {
+        isRight = true;
+        flipHorizontally();
+      }
+      playerSpeed = 1500;
+      animation = dinoRunAnimation;
+      posX++;
+    }
+    if ((keysPressed.contains(LogicalKeyboardKey.arrowLeft) || keysPressed.contains(LogicalKeyboardKey.keyA)) &&
+        (keysPressed.contains(LogicalKeyboardKey.shiftLeft) || keysPressed.contains(LogicalKeyboardKey.shiftRight))) {
+      if (isRight) {
+        playerSpeed = 1500;
+
+        isRight = false;
+        flipHorizontally();
+      }
+      animation = dinoRunAnimation;
+      posX--;
+    }
+
+    return true;
+  }
+
+  @override
+  void update(double dt) {
+    position.x += dt * posX * playerSpeed;
+    position.y += dt * posY * playerSpeed;
+
+    posX = 0;
+    posY = 0;
+
+    super.update(dt);
   }
 }
 
@@ -53,7 +178,7 @@ extension CreateAnimationByLimit on SpriteSheet {
         y++;
       }
       spriteList.add(getSprite(x, y));
-      print('x: $x, y: $y');
+      // print('x: $x, y: $y');
     }
     return SpriteAnimation.spriteList(spriteList, stepTime: stepTime, loop: loop);
   }
