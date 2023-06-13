@@ -50,24 +50,25 @@ class CirclePositionComponent extends PositionComponent with CollisionCallbacks 
       if (intersectionPoints.first[1] <= 0) {
         // top
         circleDirectionX = random.nextInt(2) == 0 ? -1 : 1;
-        circleDirectionY *= -1;
-      } else if (intersectionPoints.first[1] >= screenWidth) {
+        circleDirectionY = 1;
+      } else if (intersectionPoints.first[1] >= screenHeight) {
         // bottom
         circleDirectionX = random.nextInt(2) == 0 ? -1 : 1;
-        circleDirectionY *= -1;
+        circleDirectionY = -1;
       } else if (intersectionPoints.first[0] <= 0) {
         // left
-        circleDirectionX *= -1;
+        circleDirectionX = 1;
         circleDirectionY = random.nextInt(2) == 0 ? -1 : 1;
-      } else if (intersectionPoints.first[0] >= screenHeight) {
+      } else if (intersectionPoints.first[0] >= screenWidth) {
         // right
-        circleDirectionX *= -1;
+        circleDirectionX = -1;
         circleDirectionY = random.nextInt(2) == 0 ? -1 : 1;
-      } else {
-        circleDirectionX *= -1;
-        circleDirectionY *= -1;
       }
     }
+    // else {
+    //   circleDirectionX *= -1;
+    //   circleDirectionY *= -1;
+    // }
 
     hitBox.paint.color = ColorExtension.random();
     super.onCollision(intersectionPoints, other);
