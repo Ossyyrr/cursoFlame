@@ -36,8 +36,8 @@ class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable,
 
     animation = dinoWalkAnimation;
 
-    screenWidth = MediaQueryData.fromWindow(window).size.width;
-    screenHeight = MediaQueryData.fromWindow(window).size.height;
+    screenWidth = MediaQueryData.fromView(window).size.width;
+    screenHeight = MediaQueryData.fromView(window).size.height;
     centerX = (screenWidth / 2) - (spriteSheetWidth / 2);
     centerY = (screenHeight / 2) - (spriteSheetHeight / 2);
 
@@ -87,40 +87,9 @@ class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable,
   bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     if (keysPressed.isEmpty) animation = dinoIdleAnimation;
 
-    // ANDAR
-    if (keysPressed.contains(LogicalKeyboardKey.arrowRight) || keysPressed.contains(LogicalKeyboardKey.keyD)) {
-      if (!isRight) {
-        isRight = true;
-        flipHorizontally();
-      }
-      playerSpeed = 500;
-      animation = dinoWalkAnimation;
-      posX++;
-    }
-    if (keysPressed.contains(LogicalKeyboardKey.arrowLeft) || keysPressed.contains(LogicalKeyboardKey.keyA)) {
-      if (isRight) {
-        isRight = false;
-        flipHorizontally();
-      }
-      playerSpeed = 500;
-      animation = dinoWalkAnimation;
-      posX--;
-    }
-
-    if (keysPressed.contains(LogicalKeyboardKey.arrowUp) || keysPressed.contains(LogicalKeyboardKey.keyW)) {
-      animation = dinoWalkAnimation;
-      playerSpeed = 500;
-      posY--;
-    }
-    if (keysPressed.contains(LogicalKeyboardKey.arrowDown) || keysPressed.contains(LogicalKeyboardKey.keyS)) {
-      animation = dinoWalkAnimation;
-      playerSpeed = 500;
-      posY++;
-    }
-
-    // CORRER
+    // CORRER DERECHA
     if ((keysPressed.contains(LogicalKeyboardKey.arrowRight) || keysPressed.contains(LogicalKeyboardKey.keyD)) &&
-        (keysPressed.contains(LogicalKeyboardKey.shiftLeft) || keysPressed.contains(LogicalKeyboardKey.shiftRight))) {
+        (keysPressed.contains(LogicalKeyboardKey.shiftLeft))) {
       if (!isRight) {
         isRight = true;
         flipHorizontally();
@@ -129,16 +98,51 @@ class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable,
       animation = dinoRunAnimation;
       posX++;
     }
+    // ANDAR DERECHA
+    else if (keysPressed.contains(LogicalKeyboardKey.arrowRight) || keysPressed.contains(LogicalKeyboardKey.keyD)) {
+      if (!isRight) {
+        isRight = true;
+        flipHorizontally();
+      }
+      playerSpeed = 500;
+      animation = dinoWalkAnimation;
+      posX++;
+    }
+
+    // CORRER IZQUIERDA
     if ((keysPressed.contains(LogicalKeyboardKey.arrowLeft) || keysPressed.contains(LogicalKeyboardKey.keyA)) &&
-        (keysPressed.contains(LogicalKeyboardKey.shiftLeft) || keysPressed.contains(LogicalKeyboardKey.shiftRight))) {
+        (keysPressed.contains(LogicalKeyboardKey.shiftLeft))) {
       if (isRight) {
         playerSpeed = 1500;
-
         isRight = false;
         flipHorizontally();
       }
       animation = dinoRunAnimation;
       posX--;
+    }
+    // ANDAR IZQUIERDA
+    else if (keysPressed.contains(LogicalKeyboardKey.arrowLeft) || keysPressed.contains(LogicalKeyboardKey.keyA)) {
+      if (isRight) {
+        isRight = false;
+        flipHorizontally();
+      }
+      playerSpeed = 500;
+      animation = dinoWalkAnimation;
+      posX--;
+    }
+
+    // ANDAR ARRIBA
+    if (keysPressed.contains(LogicalKeyboardKey.arrowUp) || keysPressed.contains(LogicalKeyboardKey.keyW)) {
+      animation = dinoWalkAnimation;
+      playerSpeed = 500;
+      posY--;
+    }
+
+    // ANDAR ABAJO
+    if (keysPressed.contains(LogicalKeyboardKey.arrowDown) || keysPressed.contains(LogicalKeyboardKey.keyS)) {
+      animation = dinoWalkAnimation;
+      playerSpeed = 500;
+      posY++;
     }
 
     return true;
