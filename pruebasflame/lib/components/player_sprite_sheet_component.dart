@@ -48,8 +48,8 @@ class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable,
     debugMode = true; // Permite ver los hitBox
 
     RectangleHitbox dinoHitBox = RectangleHitbox(
-      size: Vector2(spriteSheetWidth / 8, spriteSheetHeight / 4),
-      position: Vector2(8, 0),
+      size: Vector2(spriteSheetWidth / 8 - 8, spriteSheetHeight / 4 - 20),
+      position: Vector2(10, 8),
     );
 
     add(dinoHitBox); // agregarle un hitbox
