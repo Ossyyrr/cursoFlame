@@ -8,6 +8,10 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
 class CirclePositionComponent extends PositionComponent with CollisionCallbacks {
+  CirclePositionComponent({this.isCountActive = false});
+  bool isCountActive;
+  int counter = 0;
+
   static const int circleSpeed = 250;
   static const double circleWidth = 100, circleHeigth = 100;
   late int circleDirectionX;
@@ -65,11 +69,16 @@ class CirclePositionComponent extends PositionComponent with CollisionCallbacks 
         circleDirectionY = random.nextInt(2) == 0 ? -1 : 1;
       }
     }
-    // else {
-    //   circleDirectionX *= -1;
-    //   circleDirectionY *= -1;
-    // }
+    if (other is CirclePositionComponent) {
+      circleDirectionX *= -1;
+      circleDirectionY *= -1;
+    }
 
+    if (isCountActive) {
+      counter++;
+      print(counter);
+    }
+    
     hitBox.paint.color = ColorExtension.random();
     super.onCollision(intersectionPoints, other);
   }

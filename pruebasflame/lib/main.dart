@@ -14,7 +14,7 @@ class MyGame extends FlameGame with KeyboardEvents, HasTappables, HasKeyboardHan
   Future<void> onLoad() async {
     add(ScreenHitbox()); // HitBox en los bordes de la pantalla
     add(PlayerSpriteSheetComponent());
-    add(CirclePositionComponent());
+    add(CirclePositionComponent(isCountActive: true));
     add(CirclePositionComponent());
     add(CirclePositionComponent());
     return super.onLoad();
