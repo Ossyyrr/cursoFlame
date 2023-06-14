@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
@@ -7,7 +8,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable, KeyboardHandler {
+class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable, KeyboardHandler, CollisionCallbacks {
   // Tappable para los eventos de toque
   // KeyboardHandler necesita el HasKeyboardHandlerComponents en el main
   late double screenWidth, screenHeight, centerX, centerY;
@@ -38,11 +39,20 @@ class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable,
 
     screenWidth = MediaQueryData.fromView(window).size.width;
     screenHeight = MediaQueryData.fromView(window).size.height;
-    centerX = (screenWidth / 2) - (spriteSheetWidth / 2);
-    centerY = (screenHeight / 2) - (spriteSheetHeight / 2);
+    centerX = (screenWidth / 2) - (spriteSheetWidth / 8);
+    centerY = (screenHeight / 2) - (spriteSheetHeight / 8);
 
     size = Vector2(spriteSheetWidth / 4, spriteSheetHeight / 4); // Tamaño dino
     position = Vector2(centerX, centerY);
+
+    debugMode = true; // Permite ver los hitBox
+
+    RectangleHitbox dinoHitBox = RectangleHitbox(
+      size: Vector2(spriteSheetWidth / 8, spriteSheetHeight / 4),
+      position: Vector2(8, 0),
+    );
+
+    add(dinoHitBox); // agregarle un hitbox
   }
 
   @override
@@ -157,6 +167,11 @@ class PlayerSpriteSheetComponent extends SpriteAnimationComponent with Tappable,
     posY = 0;
 
     super.update(dt);
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    print('COLLISION DINO');
   }
 }
 
